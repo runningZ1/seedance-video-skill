@@ -172,19 +172,19 @@ echo ==========================================================
 echo.
 echo Usage examples:
 echo   1. Text to video:
-echo      python scripts\\run_seedance_task.py --prompt "你的创意描述"
+echo      python scripts\\seedance_cli.py video run --prompt "你的创意描述"
 echo.
 echo   2. Image to video:
-echo      python scripts\\run_seedance_task.py --prompt "你的描述" --image-url "https://example.com/image.png"
+echo      python scripts\\seedance_cli.py video i2v --prompt "你的描述" --image-url "https://example.com/image.png"
 echo.
 echo   3. Video editing:
-echo      python scripts\\run_seedance_task.py --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
+echo      python scripts\\seedance_cli.py video run --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
 echo.
-echo   Full options: python scripts\\run_seedance_task.py --help
+echo   Full options: python scripts\\seedance_cli.py --help
 echo.
 
 if "%1"=="" goto :end
-python scripts\\run_seedance_task.py %*
+python scripts\\seedance_cli.py %*
 :end
 pause
 '''
@@ -209,22 +209,22 @@ echo "=================================================="
 echo ""
 echo "Usage examples:"
 echo "  1. Text to video:"
-echo "     python scripts/run_seedance_task.py --prompt '你的创意描述'"
+echo "     python scripts/seedance_cli.py video run --prompt '你的创意描述'"
 echo ""
 echo "  2. Image to video:"
-echo "     python scripts/run_seedance_task.py --prompt '你的描述' --image-url 'https://example.com/image.png'"
+echo "     python scripts/seedance_cli.py video i2v --prompt '你的描述' --image-url 'https://example.com/image.png'"
 echo ""
 echo "  3. Video editing:"
-echo "     python scripts/run_seedance_task.py --prompt '替换视频中的物品' --video-url 'https://example.com/video.mp4' --image-url 'https://example.com/image.png'"
+echo "     python scripts/seedance_cli.py video run --prompt '替换视频中的物品' --video-url 'https://example.com/video.mp4' --image-url 'https://example.com/image.png'"
 echo ""
-echo "  Full options: python scripts/run_seedance_task.py --help"
+echo "  Full options: python scripts/seedance_cli.py --help"
 echo ""
 
 if [ $# -eq 0 ]; then
     echo "No arguments provided. Showing help:"
-    python scripts/run_seedance_task.py --help
+    python scripts/seedance_cli.py --help
 else
-    python scripts/run_seedance_task.py "$@"
+    python scripts/seedance_cli.py "$@"
 fi
 '''
         script_path = scripts_dir / "seedance.sh"
@@ -358,8 +358,8 @@ Examples:
 
     print()
     print("Example commands:")
-    print("  python scripts/run_seedance_task.py --prompt '日出时分的海边风景' --ratio 16:9 --duration 5")
-    print("  python scripts/run_seedance_task.py --help")
+    print("  python scripts/seedance_cli.py video run --prompt '日出时分的海边风景' --ratio 16:9 --duration 5")
+    print("  python scripts/seedance_cli.py --help")
     print()
 
     return 0

@@ -192,7 +192,7 @@ def write_json(path: str, payload: Any) -> None:
     )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Create and poll Duomi text-to-image tasks.")
     parser.add_argument("--base-url", default=os.environ.get("DUOMI_BASE_URL", "https://duomiapi.com"))
     parser.add_argument("--api-key", default=os.environ.get("DUOMI_API_KEY"))
@@ -210,13 +210,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout", type=int, default=300)
     parser.add_argument("--no-poll", action="store_true")
     parser.add_argument("--output-json")
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     env_path = Path(__file__).resolve().parents[1] / ".env"
     load_env_file(env_path)
-    args = parse_args()
+    args = parse_args(argv)
 
     if not args.api_key:
         print("DUOMI_API_KEY is missing (or pass --api-key).", file=sys.stderr)

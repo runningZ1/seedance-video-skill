@@ -54,7 +54,7 @@ fi
 
 # 2. Create Virtual Environment
 echo "[2/4] Creating virtual environment (.venv)..."
-"$UV_CMD" venv .venv --python 3.12
+"$UV_CMD" venv .venv --python 3.10
 
 # 3. Install Dependencies
 echo "[3/4] Installing SDK (volcengine-python-sdk[ark])..."
@@ -72,24 +72,24 @@ echo "Seedance Video Generation - Quick Start"
 echo ""
 echo "Usage examples:"
 echo "  1. Text to video:"
-echo "     python scripts/run_seedance_task.py --prompt '你的创意描述'"
+echo "     python scripts/seedance_cli.py video run --prompt '你的创意描述'"
 echo ""
 echo "  2. Image to video:"
-echo "     python scripts/run_seedance_task.py --prompt '你的描述' --image-url 'https://example.com/image.png'"
+echo "     python scripts/seedance_cli.py video i2v --prompt '你的描述' --image-url 'https://example.com/image.png'"
 echo ""
 echo "  3. Video editing:"
-echo "     python scripts/run_seedance_task.py --prompt '替换视频中的物品' --video-url 'https://example.com/video.mp4' --image-url 'https://example.com/image.png'"
+echo "     python scripts/seedance_cli.py video run --prompt '替换视频中的物品' --video-url 'https://example.com/video.mp4' --image-url 'https://example.com/image.png'"
 echo ""
-echo "  For more options: python scripts/run_seedance_task.py --help"
+echo "  For more options: python scripts/seedance_cli.py --help"
 
 if [ $# -eq 0 ]; then
     echo ""
     echo "No arguments provided. Showing help:"
-    python scripts/run_seedance_task.py --help
+    python scripts/seedance_cli.py --help
 fi
 
 if [ $# -gt 0 ]; then
-    python scripts/run_seedance_task.py "$@"
+    python scripts/seedance_cli.py "$@"
 fi
 EOF
 
@@ -109,6 +109,6 @@ echo "Or activate the environment manually:"
 echo "  source .venv/bin/activate"
 echo ""
 echo "Example commands:"
-echo "  python scripts/run_seedance_task.py --prompt '日出时分的海边风景' --ratio 16:9 --duration 5"
-echo "  python scripts/run_seedance_task.py --help"
+echo "  python scripts/seedance_cli.py video run --prompt '日出时分的海边风景' --ratio 16:9 --duration 5"
+echo "  python scripts/seedance_cli.py --help"
 echo ""

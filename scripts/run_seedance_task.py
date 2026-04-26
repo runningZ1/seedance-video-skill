@@ -282,7 +282,7 @@ def write_json(path: str, data: Any) -> None:
     target.write_text(json.dumps(to_plain(data), ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Create and poll Volcengine Seedance video generation tasks."
     )
@@ -316,14 +316,33 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--draft-task-id")
 
-    parser.add_argument("--generate-audio", type=parse_bool)
+    parser.add_argument(
+        "--generate-audio",
+        nargs="?",
+        const="true",
+        type=parse_bool,
+        help="Generate audio. Accepts true/false; if value is omitted, true is used.",
+    )
     parser.add_argument("--resolution")
     parser.add_argument("--ratio")
     parser.add_argument("--duration", type=int)
     parser.add_argument("--frames", type=int)
     parser.add_argument("--seed", type=int)
-    parser.add_argument("--camera-fixed", type=parse_bool, dest="camera_fixed")
-    parser.add_argument("--watermark", type=parse_bool)
+    parser.add_argument(
+        "--camera-fixed",
+        nargs="?",
+        const="true",
+        type=parse_bool,
+        dest="camera_fixed",
+        help="Enable fixed camera. Accepts true/false; if value is omitted, true is used.",
+    )
+    parser.add_argument(
+        "--watermark",
+        nargs="?",
+        const="true",
+        type=parse_bool,
+        help="Enable watermark. Accepts true/false; if value is omitted, true is used.",
+    )
     parser.add_argument("--callback-url")
     parser.add_argument("--draft", action="store_true")
     parser.add_argument(
@@ -333,9 +352,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--return-last-frame",
+        nargs="?",
+        const="true",
         type=parse_bool,
         dest="return_last_frame",
-        help="Return the last frame image URL of the generated video.",
+        help="Return the last frame image URL. Accepts true/false; if value is omitted, true is used.",
     )
     parser.add_argument(
         "--service-tier",
@@ -353,14 +374,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout", type=int, default=1800)
     parser.add_argument("--no-poll", action="store_true")
     parser.add_argument("--output-json")
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     env_path = Path(__file__).resolve().parents[1] / ".env"
     load_env_file(env_path)
 
-    args = parse_args()
+    args = parse_args(argv)
 
     if args.poll_interval <= 0:
         print("--poll-interval must be > 0", file=sys.stderr)

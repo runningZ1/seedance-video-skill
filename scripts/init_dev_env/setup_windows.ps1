@@ -40,13 +40,10 @@ param(
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
 
-# Get the script directory and navigate to skill root
+# Resolve skill root from script path (scripts/init_dev_env -> project root)
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location $ScriptDir
-while ((Get-Location).Name -ne "seedance-video-generation" -and (Get-Location).Parent) {
-    Set-Location ..
-}
-$SkillRoot = Get-Location
+$SkillRoot = (Resolve-Path (Join-Path $ScriptDir "..\..")).Path
+Set-Location $SkillRoot
 
 $VenvName = ".venv"
 $RequiredPythonVersion = [version]"3.10"
@@ -55,7 +52,7 @@ $RequiredPackages = @("volcengine-python-sdk[ark]")
 function Write-Step {
     param([string]$Message)
     Write-Host "" -ForegroundColor Cyan
-    Write-Host "[$((Get-Location).Name]] $Message" -ForegroundColor Cyan
+    Write-Host "[$((Get-Location).Name)] $Message" -ForegroundColor Cyan
 }
 
 function Write-Success {
@@ -226,19 +223,19 @@ echo ==========================================================
 echo.
 echo Usage examples:
 echo   1. Text to video:
-echo      python scripts\run_seedance_task.py --prompt "你的创意描述"
+echo      python scripts\seedance_cli.py video run --prompt "你的创意描述"
 echo.
 echo   2. Image to video:
-echo      python scripts\run_seedance_task.py --prompt "你的描述" --image-url "https://example.com/image.png"
+echo      python scripts\seedance_cli.py video i2v --prompt "你的描述" --image-url "https://example.com/image.png"
 echo.
 echo   3. Video editing:
-echo      python scripts\run_seedance_task.py --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
+echo      python scripts\seedance_cli.py video run --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
 echo.
-echo   Full options: python scripts\run_seedance_task.py --help
+echo   Full options: python scripts\seedance_cli.py --help
 echo.
 
 if "%1"=="" goto :end
-python scripts\run_seedance_task.py %*
+python scripts\seedance_cli.py %*
 :end
 pause
 "@
@@ -270,22 +267,22 @@ Write-Host "==========================================================" -Foregro
 Write-Host ""
 Write-Host "Usage examples:"
 Write-Host "  1. Text to video:"
-Write-Host "     python scripts\run_seedance_task.py --prompt `"你的创意描述`""
+Write-Host "     python scripts\seedance_cli.py video run --prompt `"你的创意描述`""
 Write-Host ""
 Write-Host "  2. Image to video:"
-Write-Host "     python scripts\run_seedance_task.py --prompt `"你的描述`" --image-url `"https://example.com/image.png`""
+Write-Host "     python scripts\seedance_cli.py video i2v --prompt `"你的描述`" --image-url `"https://example.com/image.png`""
 Write-Host ""
 Write-Host "  3. Video editing:"
-Write-Host "     python scripts\run_seedance_task.py --prompt `"替换视频中的物品`" --video-url `"https://example.com/video.mp4`" --image-url `"https://example.com/image.png`""
+Write-Host "     python scripts\seedance_cli.py video run --prompt `"替换视频中的物品`" --video-url `"https://example.com/video.mp4`" --image-url `"https://example.com/image.png`""
 Write-Host ""
-Write-Host "  Full options: python scripts\run_seedance_task.py --help"
+Write-Host "  Full options: python scripts\seedance_cli.py --help"
 Write-Host ""
 
 if ($Args.Count -eq 0) {
     Write-Host "No arguments provided. Showing help:"
-    & python scripts\run_seedance_task.py --help
+    & python scripts\seedance_cli.py --help
 } else {
-    & python scripts\run_seedance_task.py $Args
+    & python scripts\seedance_cli.py $Args
 }
 '@
 
@@ -328,8 +325,8 @@ Write-Host "  Manual activation:" -ForegroundColor Yellow
 Write-Host "    & .\.venv\Scripts\Activate.ps1" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Example commands:" -ForegroundColor White
-Write-Host '  python scripts\run_seedance_task.py --prompt "日出时分的海边风景" --ratio 16:9 --duration 5' -ForegroundColor Gray
-Write-Host "  python scripts\run_seedance_task.py --help" -ForegroundColor Gray
+Write-Host '  python scripts\seedance_cli.py video run --prompt "日出时分的海边风景" --ratio 16:9 --duration 5' -ForegroundColor Gray
+Write-Host "  python scripts\seedance_cli.py --help" -ForegroundColor Gray
 Write-Host ""
 
 if (-not $Quiet) {

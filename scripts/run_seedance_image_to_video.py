@@ -23,7 +23,7 @@ from run_seedance_task import (
 )
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Create and poll Seedance image-to-video generation tasks."
     )
@@ -46,13 +46,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--duration", type=int, default=5)
     parser.add_argument("--frames", type=int)
     parser.add_argument("--seed", type=int)
-    parser.add_argument("--camera-fixed", type=parse_bool, dest="camera_fixed")
-    parser.add_argument("--watermark", type=parse_bool)
+    parser.add_argument(
+        "--camera-fixed",
+        nargs="?",
+        const="true",
+        type=parse_bool,
+        dest="camera_fixed",
+    )
+    parser.add_argument(
+        "--watermark",
+        nargs="?",
+        const="true",
+        type=parse_bool,
+    )
     parser.add_argument(
         "--generate-audio",
+        nargs="?",
+        const="true",
         type=parse_bool,
         default=False,
-        help="Enable generated audio. Default false for image-to-video.",
+        help="Enable generated audio. Accepts true/false; if value is omitted, true is used.",
     )
     parser.add_argument("--callback-url")
 
@@ -60,7 +73,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout", type=int, default=1800)
     parser.add_argument("--no-poll", action="store_true")
     parser.add_argument("--output-json")
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def to_seedance_namespace(args: argparse.Namespace) -> SimpleNamespace:
@@ -86,13 +99,17 @@ def to_seedance_namespace(args: argparse.Namespace) -> SimpleNamespace:
         watermark=args.watermark,
         callback_url=args.callback_url,
         draft=False,
+        web_search=False,
+        return_last_frame=None,
+        service_tier=None,
+        execution_expires_after=None,
     )
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     env_path = Path(__file__).resolve().parents[1] / ".env"
     load_env_file(env_path)
-    args = parse_args()
+    args = parse_args(argv)
 
     if not args.image_url and not args.image_file:
         print("At least one --image-url or --image-file is required.", file=sys.stderr)

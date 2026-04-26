@@ -7,13 +7,13 @@ description: Use this skill when Codex needs to create, edit, or extend videos w
 
 Implement Seedance video workflows with a deterministic API-first process: build content payload, create async task, poll status, and return downloadable result URLs.
 
-Use `scripts/run_seedance_task.py` for execution and read targeted references only when needed.
+Use `scripts/seedance_cli.py` as the unified entrypoint and read targeted references only when needed.
 
 ## Workflow
 
 1. Confirm prerequisites.
 - Require `ARK_API_KEY` in environment.
-- `scripts/run_seedance_task.py` auto-loads `seedance-video-generation/.env` before reading env vars.
+- `scripts/run_seedance_task.py` (called by `scripts/seedance_cli.py`) auto-loads `seedance-video-generation/.env` before reading env vars.
 - Choose `model` (`doubao-seedance-2-0-260128` for quality, `doubao-seedance-2-0-fast-260128` for speed/cost).
 - For images, use URL or local file (`--image-file`, auto-base64). For videos, keep URL input.
 - Ensure media URLs are publicly accessible.
@@ -116,7 +116,7 @@ This will:
 Python helper (recommended):
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --model doubao-seedance-2-0-260128 \
   --prompt "将视频1礼盒中的香水替换成图片1中的面霜，运镜不变" \
   --video-url "https://.../input.mp4" \
@@ -130,7 +130,7 @@ python scripts/run_seedance_task.py \
 Local image + URL image mixed input (order: URL first, then local file):
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "参考图片1和图片2，生成产品广告镜头" \
   --image-url "https://.../ref1.png" \
   --image-file "D:/materials/ref2.png"
@@ -139,7 +139,7 @@ python scripts/run_seedance_task.py \
 Video extension (connect 3 clips with transitions):
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "视频1中的拱形窗户打开，进入美术馆室内，接视频2，之后镜头进入画内，接视频3" \
   --video-url "https://.../clip1.mp4" \
   --video-url "https://.../clip2.mp4" \
@@ -151,7 +151,7 @@ python scripts/run_seedance_task.py \
 Web search enabled (text-only):
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "微距镜头对准叶片上翠绿的玻璃蛙，联网搜索玻璃蛙的容貌特征。" \
   --ratio 16:9 \
   --duration 11
@@ -161,9 +161,9 @@ Draft to final flow (if user requests sample mode):
 
 ```bash
 # Step 1: create draft
-python scripts/run_seedance_task.py --prompt "..." --model doubao-seedance-2-0-260128 --draft
+python scripts/seedance_cli.py video run --prompt "..." --model doubao-seedance-2-0-260128 --draft
 # Step 2: create final by draft task id
-python scripts/run_seedance_task.py --model doubao-seedance-2-0-260128 --draft-task-id cgt-xxxx
+python scripts/seedance_cli.py video run --model doubao-seedance-2-0-260128 --draft-task-id cgt-xxxx
 ```
 
 ## References Routing

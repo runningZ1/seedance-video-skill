@@ -35,6 +35,7 @@ seedance-video-skill/
 ├── agents/
 │   └── openai.yaml                    # Agent interface metadata
 ├── scripts/
+│   ├── seedance_cli.py               # Unified CLI entrypoint (recommended)
 │   ├── run_seedance_task.py           # Main CLI — create & poll any Seedance task
 │   ├── run_seedance_image_to_video.py # Dedicated image-to-video wrapper
 │   ├── run_duomi_nano_banana_text2img.py # Text-to-image via Duomi API (fallback)
@@ -47,7 +48,6 @@ seedance-video-skill/
 ├── references/
 │   ├── api-workflow.md                # API payload, polling, parameters, limits
 │   ├── prompt-playbook.md             # Prompt templates and multimodal reference guide
-│   └── [PDF source docs]              # Official Volcengine Seedance 2.0 guides (CN)
 └── outputs/                           # Generated task results (JSON, MP4, PNG)
 ```
 
@@ -80,12 +80,20 @@ python ../init_environment.py --quiet
 
 Setup creates a `.venv` virtual environment, installs `volcengine-python-sdk[ark]`, and generates convenience run scripts (`seedance.bat` / `seedance.sh`).
 
+### Recommended unified CLI
+
+```bash
+python scripts/seedance_cli.py --help
+```
+
+You can still call old scripts directly, but `seedance_cli.py` is the single entrypoint for faster command discovery.
+
 ## Usage
 
 ### Text-to-video
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --model doubao-seedance-2-0-260128 \
   --prompt "一只玻璃蛙栖息在雨后的热带叶片上，微距镜头，晨光折射" \
   --ratio 16:9 \
@@ -96,7 +104,7 @@ python scripts/run_seedance_task.py \
 ### Image-to-video (R2V)
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "参考 图片1 和 图片2 中的产品，白色背景，以产品为主体缓慢旋转展示正面侧面背面" \
   --image-url "https://example.com/product_front.png" \
   --image-file "D:/materials/product_back.png" \
@@ -107,7 +115,7 @@ python scripts/run_seedance_task.py \
 ### Video editing (V2V)
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "将 视频1 中的香水替换成 图片1 中的面霜，动作和运镜不变" \
   --video-url "https://example.com/original.mp4" \
   --image-file "D:/materials/cream.png" \
@@ -118,7 +126,7 @@ python scripts/run_seedance_task.py \
 ### Video extension (track-fill, 3 clips)
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "视频1中的拱形窗户打开，进入美术馆室内，接视频2，之后镜头进入画内，接视频3" \
   --video-url "https://example.com/clip1.mp4" \
   --video-url "https://example.com/clip2.mp4" \
@@ -132,7 +140,7 @@ python scripts/run_seedance_task.py \
 ### Web search (text-only)
 
 ```bash
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --prompt "微距镜头对准叶片上翠绿的玻璃蛙，联网搜索玻璃蛙的容貌特征。" \
   --web-search \
   --ratio 16:9 \
@@ -143,13 +151,13 @@ python scripts/run_seedance_task.py \
 
 ```bash
 # Step 1: create draft
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --model doubao-seedance-2-0-260128 \
   --prompt "..." \
   --draft
 
 # Step 2: finalize from draft task ID
-python scripts/run_seedance_task.py \
+python scripts/seedance_cli.py video run \
   --model doubao-seedance-2-0-260128 \
   --draft-task-id cgt-xxxx
 ```
