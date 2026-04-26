@@ -22,7 +22,7 @@ Use `scripts/run_seedance_task.py` for execution and read targeted references on
 - Text to video: prompt only.
 - Image/video/audio referenced generation (multimodal R2V): add any combo of `reference_image` (0–9), `reference_video` (0–3), `reference_audio` (0–3). Not supported: text+audio only, audio-only.
 - Video edit: prompt + `reference_video` as the source, optionally add `reference_image` / `reference_audio` for replacement elements.
-- Video extend (forward/backward/track-fill): prompt + 1–3 `reference_video` items. Total output ≤ 15 s.
+- Video extend (forward/backward/track-fill): prompt + 1–3 `reference_video` items. Total output ≤ 15 s. Model auto-clips join segments; original input content is preserved (not regenerated).
 - Strict first/last frame lock: use roles `first_frame` / `last_frame` on image items.
 - Virtual avatar or authorized real-person asset: use `asset://<asset-id>` as the URL; refer in prompt by ordinal (e.g., `图片1`).
 - Web search (text-only): add `tools=[{"type": "web_search"}]`; model decides whether to search.
@@ -30,9 +30,14 @@ Use `scripts/run_seedance_task.py` for execution and read targeted references on
 3. Draft high-quality prompt.
 - Keep clear subject-action-scene-camera-audio logic.
 - Use precise reference mentions: `图片1/图片2` and `视频1/视频2` based on upload order within each modality.
-- Prefer common characters for on-screen text; avoid rare symbols.
+- Prefer common characters for on-screen text; avoid rare symbols and special characters.
+- For slogan/advertising text: `「文字内容」+「出现时机」+「出现位置」+「出现方式」，「文字特征」`
+- For subtitle sync: `画面底部出现字幕，字幕内容为"……"，字幕需与音频节奏完全同步。`
 - For bubble text: `「角色」说："…"，角色说话时周围出现气泡，气泡里写着台词。`
-- For track-fill: `视频1，[过渡描述]，接视频2，[过渡描述]，接视频3。`
+- For strict logo/brand text fidelity: supply logo as an image asset and use `画面逐渐模糊，后出现图片1的Logo。`
+- For multi-angle product reference: upload 2–3 angle images and `提取 图片1、图片2、图片3 的[产品]，以[产品]为主体缓慢旋转，清晰展示正面侧面背面。`
+- For multi-element assembly: `图片1中的[角色]身着图片2中的[服装]，在图片4中的[场景]内，图片5中的[标识]始终显示在画面[位置]。`
+- For track-fill: `视频1，[过渡描述]，接视频2，[过渡描述]，接视频3。` (max 3 clips, total ≤ 15s; model auto-clips join segments, input not re-generated)
 - For all templates and examples, read `references/prompt-playbook.md`.
 
 4. Build request and submit task.
