@@ -38,7 +38,6 @@ seedance-video-skill/
 │   ├── seedance_cli.py               # Unified CLI entrypoint (recommended)
 │   ├── run_seedance_task.py           # Main CLI — create & poll any Seedance task
 │   ├── run_seedance_image_to_video.py # Dedicated image-to-video wrapper
-│   ├── run_duomi_nano_banana_text2img.py # Text-to-image via Duomi API (fallback)
 │   ├── init_environment.py            # One-time Python environment setup
 │   ├── preview.html                   # Demo preview
 │   └── init_dev_env/
