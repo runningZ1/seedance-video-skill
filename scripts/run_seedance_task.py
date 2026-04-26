@@ -224,6 +224,8 @@ def build_payload(args: argparse.Namespace) -> dict[str, Any]:
         payload["return_last_frame"] = "true"
     if args.service_tier:
         payload["service_tier"] = args.service_tier
+    if args.execution_expires_after is not None:
+        payload["execution_expires_after"] = args.execution_expires_after
 
     # For non-draft-task flow, set practical defaults.
     if not args.draft_task_id:
@@ -338,7 +340,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--service-tier",
         dest="service_tier",
-        help='Set to "flex" for offline/batch inference.',
+        help='Set to "flex" for offline/batch inference (50%% cost; not available for 2.0/2.0-fast).',
+    )
+    parser.add_argument(
+        "--execution-expires-after",
+        type=int,
+        dest="execution_expires_after",
+        help="Seconds until task auto-terminates (use with --service-tier flex). Default: 172800 (48h).",
     )
 
     parser.add_argument("--poll-interval", type=float, default=15.0)
