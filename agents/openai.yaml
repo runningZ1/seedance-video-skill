@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seedance 2.0 Video"
+  short_description: "Generate and edit videos with Seedance 2.0 on Ark Runtime"
+  default_prompt: "Use $seedance-video-generation to create a Seedance 2.0 task with strong prompts and status polling."
