@@ -92,18 +92,18 @@ You can still call old scripts directly, but `seedance_cli.py` is the single ent
 ### Text-to-video
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py image-to-video \
   --model doubao-seedance-2-0-260128 \
   --prompt "一只玻璃蛙栖息在雨后的热带叶片上，微距镜头，晨光折射" \
   --ratio 16:9 \
   --duration 5 \
-  --generate-audio true
+  --generate-audio
 ```
 
 ### Image-to-video (R2V)
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "参考 图片1 和 图片2 中的产品，白色背景，以产品为主体缓慢旋转展示正面侧面背面" \
   --image-url "https://example.com/product_front.png" \
   --image-file "D:/materials/product_back.png" \
@@ -114,7 +114,7 @@ python scripts/seedance_cli.py video run \
 ### Video editing (V2V)
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "将 视频1 中的香水替换成 图片1 中的面霜，动作和运镜不变" \
   --video-url "https://example.com/original.mp4" \
   --image-file "D:/materials/cream.png" \
@@ -125,7 +125,7 @@ python scripts/seedance_cli.py video run \
 ### Video extension (track-fill, 3 clips)
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "视频1中的拱形窗户打开，进入美术馆室内，接视频2，之后镜头进入画内，接视频3" \
   --video-url "https://example.com/clip1.mp4" \
   --video-url "https://example.com/clip2.mp4" \
@@ -139,7 +139,7 @@ python scripts/seedance_cli.py video run \
 ### Web search (text-only)
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "微距镜头对准叶片上翠绿的玻璃蛙，联网搜索玻璃蛙的容貌特征。" \
   --web-search \
   --ratio 16:9 \
@@ -150,13 +150,13 @@ python scripts/seedance_cli.py video run \
 
 ```bash
 # Step 1: create draft
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --model doubao-seedance-2-0-260128 \
   --prompt "..." \
   --draft
 
 # Step 2: finalize from draft task ID
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --model doubao-seedance-2-0-260128 \
   --draft-task-id cgt-xxxx
 ```
@@ -223,6 +223,27 @@ See [references/prompt-playbook.md](references/prompt-playbook.md) for the full 
 | Web search | `--web-search` | Text-only tasks |
 | Batch mode | `--service-tier flex` | Lower cost, not real-time |
 | Output JSON | `--output-json` | Persist result to file |
+
+### Feature Switches (simple mode)
+
+Switch parameters are plain on/off flags:
+- Add the flag = **enabled**
+- Omit the flag = **disabled**
+
+Examples:
+```bash
+--web-search          # enable web search
+--camera-fixed        # enable fixed camera
+--watermark           # enable watermark
+--return-last-frame   # request last frame output
+--no-poll             # create task only, skip polling
+```
+
+Audio has one explicit off switch:
+```bash
+--generate-audio      # enable audio
+--no-generate-audio   # disable audio
+```
 
 ## Production Guardrails
 

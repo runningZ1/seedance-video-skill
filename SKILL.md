@@ -116,21 +116,21 @@ This will:
 Python helper (recommended):
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py image-to-video \
   --model doubao-seedance-2-0-260128 \
   --prompt "将视频1礼盒中的香水替换成图片1中的面霜，运镜不变" \
   --video-url "https://.../input.mp4" \
   --image-file "D:/materials/cream.png" \
   --ratio 16:9 \
   --duration 5 \
-  --watermark true \
-  --generate-audio true
+  --watermark \
+  --generate-audio
 ```
 
 Local image + URL image mixed input (order: URL first, then local file):
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "参考图片1和图片2，生成产品广告镜头" \
   --image-url "https://.../ref1.png" \
   --image-file "D:/materials/ref2.png"
@@ -139,7 +139,7 @@ python scripts/seedance_cli.py video run \
 Video extension (connect 3 clips with transitions):
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "视频1中的拱形窗户打开，进入美术馆室内，接视频2，之后镜头进入画内，接视频3" \
   --video-url "https://.../clip1.mp4" \
   --video-url "https://.../clip2.mp4" \
@@ -151,7 +151,7 @@ python scripts/seedance_cli.py video run \
 Web search enabled (text-only):
 
 ```bash
-python scripts/seedance_cli.py video run \
+python scripts/seedance_cli.py video \
   --prompt "微距镜头对准叶片上翠绿的玻璃蛙，联网搜索玻璃蛙的容貌特征。" \
   --ratio 16:9 \
   --duration 11
@@ -161,9 +161,9 @@ Draft to final flow (if user requests sample mode):
 
 ```bash
 # Step 1: create draft
-python scripts/seedance_cli.py video run --prompt "..." --model doubao-seedance-2-0-260128 --draft
+python scripts/seedance_cli.py video --prompt "..." --model doubao-seedance-2-0-260128 --draft
 # Step 2: create final by draft task id
-python scripts/seedance_cli.py video run --model doubao-seedance-2-0-260128 --draft-task-id cgt-xxxx
+python scripts/seedance_cli.py video --model doubao-seedance-2-0-260128 --draft-task-id cgt-xxxx
 ```
 
 ## References Routing

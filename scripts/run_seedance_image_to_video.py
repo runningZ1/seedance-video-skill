@@ -15,7 +15,6 @@ from run_seedance_task import (
     build_payload,
     get_field,
     load_env_file,
-    parse_bool,
     summarize_for_log,
     to_plain,
     wait_for_terminal_status,
@@ -46,27 +45,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--duration", type=int, default=5)
     parser.add_argument("--frames", type=int)
     parser.add_argument("--seed", type=int)
-    parser.add_argument(
-        "--camera-fixed",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-        dest="camera_fixed",
-    )
-    parser.add_argument(
-        "--watermark",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-    )
-    parser.add_argument(
-        "--generate-audio",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-        default=False,
-        help="Enable generated audio. Accepts true/false; if value is omitted, true is used.",
-    )
+    parser.add_argument("--camera-fixed", dest="camera_fixed", action="store_true")
+    parser.add_argument("--watermark", dest="watermark", action="store_true")
+    parser.add_argument("--generate-audio", dest="generate_audio", action="store_true", default=False)
+    parser.set_defaults(camera_fixed=None, watermark=None)
     parser.add_argument("--callback-url")
 
     parser.add_argument("--poll-interval", type=float, default=15.0)

@@ -223,13 +223,13 @@ echo ==========================================================
 echo.
 echo Usage examples:
 echo   1. Text to video:
-echo      python scripts\seedance_cli.py video run --prompt "你的创意描述"
+echo      python scripts\seedance_cli.py video --prompt "你的创意描述"
 echo.
 echo   2. Image to video:
-echo      python scripts\seedance_cli.py video i2v --prompt "你的描述" --image-url "https://example.com/image.png"
+echo      python scripts\seedance_cli.py image-to-video --prompt "你的描述" --image-url "https://example.com/image.png"
 echo.
 echo   3. Video editing:
-echo      python scripts\seedance_cli.py video run --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
+echo      python scripts\seedance_cli.py video --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
 echo.
 echo   Full options: python scripts\seedance_cli.py --help
 echo.
@@ -267,13 +267,13 @@ Write-Host "==========================================================" -Foregro
 Write-Host ""
 Write-Host "Usage examples:"
 Write-Host "  1. Text to video:"
-Write-Host "     python scripts\seedance_cli.py video run --prompt `"你的创意描述`""
+Write-Host "     python scripts\seedance_cli.py video --prompt `"你的创意描述`""
 Write-Host ""
 Write-Host "  2. Image to video:"
-Write-Host "     python scripts\seedance_cli.py video i2v --prompt `"你的描述`" --image-url `"https://example.com/image.png`""
+Write-Host "     python scripts\seedance_cli.py image-to-video --prompt `"你的描述`" --image-url `"https://example.com/image.png`""
 Write-Host ""
 Write-Host "  3. Video editing:"
-Write-Host "     python scripts\seedance_cli.py video run --prompt `"替换视频中的物品`" --video-url `"https://example.com/video.mp4`" --image-url `"https://example.com/image.png`""
+Write-Host "     python scripts\seedance_cli.py video --prompt `"替换视频中的物品`" --video-url `"https://example.com/video.mp4`" --image-url `"https://example.com/image.png`""
 Write-Host ""
 Write-Host "  Full options: python scripts\seedance_cli.py --help"
 Write-Host ""
@@ -325,7 +325,7 @@ Write-Host "  Manual activation:" -ForegroundColor Yellow
 Write-Host "    & .\.venv\Scripts\Activate.ps1" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Example commands:" -ForegroundColor White
-Write-Host '  python scripts\seedance_cli.py video run --prompt "日出时分的海边风景" --ratio 16:9 --duration 5' -ForegroundColor Gray
+Write-Host '  python scripts\seedance_cli.py video --prompt "日出时分的海边风景" --ratio 16:9 --duration 5' -ForegroundColor Gray
 Write-Host "  python scripts\seedance_cli.py --help" -ForegroundColor Gray
 Write-Host ""
 

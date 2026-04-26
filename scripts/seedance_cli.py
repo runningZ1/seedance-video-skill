@@ -27,19 +27,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     subparsers = parser.add_subparsers(dest="command")
 
-    video_parser = subparsers.add_parser("video", help="Seedance video workflows")
-    video_sub = video_parser.add_subparsers(dest="video_command")
-    video_sub.add_parser(
-        "run",
-        help="General Seedance task flow (maps to run_seedance_task.py)",
-    )
-    video_sub.add_parser(
-        "i2v",
-        help="Image-to-video quick flow (maps to run_seedance_image_to_video.py)",
-    )
-
-    subparsers.add_parser("task", help="Alias of: video run")
-    subparsers.add_parser("i2v", help="Alias of: video i2v")
+    subparsers.add_parser("video", help="General Seedance video workflow")
+    subparsers.add_parser("image-to-video", help="Seedance image-to-video workflow")
 
     return parser
 
@@ -52,20 +41,10 @@ def dispatch(argv: list[str]) -> tuple[Runner | None, list[str]]:
     if first.startswith("-"):
         return run_seedance_task.main, argv
 
-    if first == "task":
-        return run_seedance_task.main, argv[1:]
-    if first == "i2v":
-        return run_seedance_image_to_video.main, argv[1:]
-
     if first == "video":
-        if len(argv) == 1:
-            return None, []
-        second = argv[1]
-        if second == "run":
-            return run_seedance_task.main, argv[2:]
-        if second == "i2v":
-            return run_seedance_image_to_video.main, argv[2:]
-        return None, []
+        return run_seedance_task.main, argv[1:]
+    if first == "image-to-video":
+        return run_seedance_image_to_video.main, argv[1:]
 
     return None, []
 
@@ -78,8 +57,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         print("")
         print("Quick examples:")
-        print("  seedance video run --prompt \"...\" --duration 5")
-        print("  seedance video i2v --prompt \"...\" --image-url \"https://...\"")
+        print("  seedance video --prompt \"...\" --duration 5")
+        print("  seedance image-to-video --prompt \"...\" --image-url \"https://...\"")
         print("")
         print("Tip: You can still pass old flags directly:")
         print("  seedance --prompt \"...\" --ratio 16:9")

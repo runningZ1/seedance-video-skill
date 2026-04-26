@@ -14,17 +14,6 @@ from pathlib import Path
 from typing import Any
 
 
-def parse_bool(raw: str) -> bool:
-    value = raw.strip().lower()
-    truthy = {"1", "true", "t", "yes", "y", "on"}
-    falsy = {"0", "false", "f", "no", "n", "off"}
-    if value in truthy:
-        return True
-    if value in falsy:
-        return False
-    raise argparse.ArgumentTypeError(f"Invalid boolean value: {raw}")
-
-
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
 ALLOWED_IMAGE_MIME = {
     "image/jpeg",
@@ -316,48 +305,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--draft-task-id")
 
-    parser.add_argument(
-        "--generate-audio",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-        help="Generate audio. Accepts true/false; if value is omitted, true is used.",
-    )
+    parser.add_argument("--generate-audio", dest="generate_audio", action="store_true")
+    parser.add_argument("--no-generate-audio", dest="generate_audio", action="store_false")
+    parser.set_defaults(generate_audio=None)
     parser.add_argument("--resolution")
     parser.add_argument("--ratio")
     parser.add_argument("--duration", type=int)
     parser.add_argument("--frames", type=int)
     parser.add_argument("--seed", type=int)
-    parser.add_argument(
-        "--camera-fixed",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-        dest="camera_fixed",
-        help="Enable fixed camera. Accepts true/false; if value is omitted, true is used.",
-    )
-    parser.add_argument(
-        "--watermark",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-        help="Enable watermark. Accepts true/false; if value is omitted, true is used.",
-    )
+    parser.add_argument("--camera-fixed", dest="camera_fixed", action="store_true")
+    parser.add_argument("--watermark", dest="watermark", action="store_true")
+    parser.set_defaults(camera_fixed=None, watermark=None)
     parser.add_argument("--callback-url")
     parser.add_argument("--draft", action="store_true")
-    parser.add_argument(
-        "--web-search",
-        action="store_true",
-        help="Enable web search tool (text-only input only). Adds tools=[{type:web_search}].",
-    )
-    parser.add_argument(
-        "--return-last-frame",
-        nargs="?",
-        const="true",
-        type=parse_bool,
-        dest="return_last_frame",
-        help="Return the last frame image URL. Accepts true/false; if value is omitted, true is used.",
-    )
+    parser.add_argument("--web-search", action="store_true")
+    parser.add_argument("--return-last-frame", dest="return_last_frame", action="store_true")
+    parser.set_defaults(return_last_frame=None)
     parser.add_argument(
         "--service-tier",
         dest="service_tier",

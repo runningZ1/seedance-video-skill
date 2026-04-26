@@ -118,13 +118,13 @@ echo echo Starting Seedance Video Generation...
 echo echo.
 echo echo Usage examples:
 echo echo   1. Text to video:
-echo echo      python scripts\seedance_cli.py video run --prompt "你的创意描述"
+echo echo      python scripts\seedance_cli.py video --prompt "你的创意描述"
 echo echo.
 echo echo   2. Image to video:
-echo echo      python scripts\seedance_cli.py video i2v --prompt "你的描述" --image-url "https://example.com/image.png"
+echo echo      python scripts\seedance_cli.py image-to-video --prompt "你的描述" --image-url "https://example.com/image.png"
 echo echo.
 echo echo   3. Video editing:
-echo echo      python scripts\seedance_cli.py video run --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
+echo echo      python scripts\seedance_cli.py video --prompt "替换视频中的物品" --video-url "https://example.com/video.mp4" --image-url "https://example.com/image.png"
 echo echo.
 echo if "%%1"=="" goto :end
 echo python scripts\seedance_cli.py %%*
@@ -146,7 +146,7 @@ echo Or activate the environment manually:
 echo   call .venv\Scripts\activate.bat
 echo.
 echo Example commands:
-echo   python scripts\seedance_cli.py video run --prompt "日出时分的海边风景" --ratio 16:9 --duration 5
+echo   python scripts\seedance_cli.py video --prompt "日出时分的海边风景" --ratio 16:9 --duration 5
 echo   python scripts\seedance_cli.py --help
 echo.
 pause
