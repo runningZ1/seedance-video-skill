@@ -2,7 +2,7 @@
 
 ## 1) Core Prompt Structure
 
-Write prompts in this order (required elements first):
+Seedance 2.0 deeply follows natural language logic. Compose prompts by combining these elements in order:
 
 1. **Subject + action** (required) — who does what; the logical foundation
 2. **Scene + visual style** (optional) — location, lighting, art direction, color palette
@@ -12,7 +12,7 @@ Write prompts in this order (required elements first):
 
 ## 2) Multimodal Referencing Rules
 
-- Keep upload order deterministic.
+- Keep upload order deterministic within each modality.
 - Refer with exact ordinal tokens: `图片1`, `图片2`, `视频1`, `音频1` (based on upload order within each modality type).
 - Do NOT reference assets by their asset ID in the prompt — always use ordinal tokens.
 - Tie each reference to a clear target:
@@ -42,7 +42,7 @@ If strict first/last frame consistency is required, use API roles `first_frame` 
 
 **Multi-image reference (multiple subjects or elements):**
 ```
-参考/提取/结合/按照/生成+图片n 中的 [被参考元素]，生成 [画面描述]，保持 [被参考元素] 特征一致。
+参考/提取/结合/按照/生成 图片n 中的 [被参考元素]，生成 [画面描述]，保持 [被参考元素] 特征一致。
 ```
 
 **Storyboard / grid shot reference:**
@@ -70,57 +70,25 @@ If strict first/last frame consistency is required, use API roles `first_frame` 
 全程使用视频1的 [构图/运镜]，全程使用音频1作为背景音乐。[主体描述]；首帧为图片1，[分段时间轴剧情描述]。
 ```
 
-### C) Video editing (V2V)
+### C) On-screen text (文字生成)
 
-**Add element:**
-```
-在 视频1 的 [时间位置] [空间位置]，增加 [元素描述]。
-```
+Model can auto-match style/color to context, or you can specify color, style, timing, position, and appearance.
+Always prefer common characters; avoid rare symbols and special characters for best rendering.
 
-**Remove element:**
-```
-删除 视频1 中的 [被删除元素]，视频其他内容保持不变。
-清除 视频1 [位置] 上的 [被删除元素]，保持 [保留内容] 不变。
-```
-
-**Replace element:**
-```
-将 视频1 中的 [对象A] 替换为 图片1 中的 [对象B]，动作和运镜不变。
-将 视频1 [位置] 中的 [对象A] 替换成 [对象B]，运镜不变。
-```
-
-### D) Video extension (extend / track fill)
-
-**Extend forward (before):**
-```
-向前延长 视频1，[延长内容描述]。
-```
-
-**Extend backward (after):**
-```
-生成 视频1 之后的内容：[延长段落剧情和镜头说明]，动作和风格与前段连续。
-```
-
-**Track completion (2–3 clips with transitions):**
-```
-视频1，[过渡画面描述]，接视频2，[过渡画面描述]，接视频3。
-```
-
-Example:
-```
-视频1中的拱形窗户打开，进入美术馆室内，接视频2，之后镜头进入画内，接视频3。
-```
-
-### E) On-screen text
-
-**Slogan / logo:**
+**Slogan / advertising copy:**
 ```
 「文字内容」+「出现时机」+「出现位置」+「出现方式」，「文字特征（颜色、风格）」
 ```
+> Note: For strict logo/brand text fidelity, use the Logo reference pattern (multi-image reference with the logo as an image asset) instead of describing text in the prompt.
 
 **Subtitle synchronized to audio:**
 ```
 画面底部出现字幕，字幕内容为"……"，字幕需与音频节奏完全同步。
+```
+
+**Multi-person dialogue with subtitles:**
+```
+[人物A]说："[台词A]"，镜头切到[人物B]，[人物B]回答："[台词B]"，角色说话时，对话随意自然，画面底部出现对应台词字幕。
 ```
 
 **Speech bubble:**
@@ -128,19 +96,37 @@ Example:
 「角色」说："……"，角色说话时周围出现气泡，气泡里写着台词。
 ```
 
-### F) Character dialogue (multi-person)
+### D) Image reference use cases (图片参考)
+
+#### 3.1 Multi-angle product / subject reference
+
+Use 2–3 images showing the same subject from different angles to constrain appearance:
 
 ```
-[人物A]说："[台词A]"，镜头切到[人物B]，[人物B]回答："[台词B]"，[人物A/B]说话时，对话随意自然，画面底部出现对应台词字幕。
+提取 图片1、图片2、图片3 的 [主体]，[背景/场景描述]，以 [主体] 为主体缓慢旋转，清晰展示正面侧面背面。
 ```
 
-## 4) Audio Reference Patterns
+#### 3.2 Multi-image reference (多图参考)
 
-- **Timbre/voice reference:** `「角色」说："「台词」"，音色参考 音频1。`
-- **Music/rhythm reference:** `全程使用音频1作为背景音乐。`
-- **Audio content at ideal moment:** `[理想出现时机] + 音频1。`
+**Logo reference** (for brand text accuracy):
+```
+[场景描述]，画面逐渐模糊，后出现图片1的Logo。
+```
 
-## 5) Image Reference Use Cases
+**Multi-subject scene:**
+```
+参考图片中的 [角色A] 和 [角色B]，在 [场景] 中，[剧情描述]。画面采用 [色调]。
+```
+
+**Multi-element assembly** (character + costume + location + branding):
+```
+图片1中的[角色]身着图片2中的[服装]，在图片4中的[场景]内，[动作]。图片5中的[标识]始终显示在画面[位置]。
+```
+
+**Storyboard / grid layout reference:**
+```
+参考图片中的分镜图，生成[画面描述]。图片中的各个分镜构图要按照顺序出现，之后[剧情延续]。
+```
 
 | Use case | Pattern |
 |---|---|
@@ -150,31 +136,110 @@ Example:
 | Multi-character scene | `参考图片1中的[角色A]，参考图片2中的[角色B]，在[场景]中[动作描述]。` |
 | Multi-element assembly | `图片1中的[角色]身着图片2中的[服装]，在图片4中的[场景]内，[图片5中的标识]始终显示在画面[位置]。` |
 
-## 6) Quality Checklist
+### E) Video reference (视频参考)
+
+#### 4.1 Action reference (动作参考)
+```
+参考 视频1 的 [动作描述]，生成 [画面描述]，保持动作细节一致。
+```
+
+#### 4.2 Camera reference (运镜参考)
+```
+参考 视频1 的 [运镜描述]，生成 [画面描述]，保持运镜一致。
+```
+
+#### 4.3 Effects reference (特效参考)
+```
+参考 视频1 的 [特效描述]，生成 [画面描述]，保持特效一致。
+```
+
+### F) Video editing (视频编辑 V2V)
+
+**Add element:**
+```
+在 视频1 的 [时间位置] [空间位置]，增加 [元素描述]。
+```
+> Tip: Clearly describe element characteristics, timing, and position.
+
+**Remove element:**
+```
+删除 视频1 中的 [被删除元素]，视频其他内容保持不变。
+清除 视频1 [位置] 上的 [被删除元素]，保持 [保留内容] 不变。
+```
+> Tip: Explicitly state which elements should remain unchanged.
+
+**Replace element:**
+```
+将 视频1 中的 [对象A] 替换为 图片1 中的 [对象B]，动作和运镜不变。
+将 视频1 [位置] 中的 [对象A] 替换成 [对象B]，运镜不变。
+```
+
+### G) Video extension (视频延长)
+
+> Note: The model automatically clips join segments; original input video content is NOT regenerated, only new content is added.
+
+**Extend backward (after clip):**
+```
+生成 视频1 之后的内容：[延长段落剧情和镜头说明]，动作和风格与前段连续。
+```
+or:
+```
+向后延长 视频1，[延长内容描述]。
+```
+
+**Extend forward (before clip):**
+```
+向前延长 视频1，[延长内容描述]。
+```
+
+**Track completion / clip connection (2–3 clips):**
+```
+视频1，[过渡画面描述]，接视频2，[过渡画面描述]，接视频3。
+```
+> Constraint: Max 3 input video clips; total combined output ≤ 15 seconds.
+
+Example:
+```
+视频1中的拱形窗户打开，进入美术馆室内，接视频2，之后镜头进入画内，接视频3。
+```
+
+## 4) Audio Reference Patterns
+
+- **Timbre/voice reference:** `「角色」说："「台词」"，音色参考 音频1。`
+- **Music/rhythm reference:** `全程使用音频1作为背景音乐。`
+- **Audio content at ideal moment:** `[理想出现时机] + 音频1。`
+
+## 5) Quality Checklist
 
 - Avoid ambiguous pronouns and missing subjects.
-- Prefer common Chinese characters; avoid rare symbols.
+- Prefer common Chinese characters for on-screen text; avoid rare symbols and special characters.
 - Do not overload one sentence with conflicting camera instructions.
 - Keep subject identity constraints explicit when multiple people appear.
-- For on-screen text, use common characters; rare symbols degrade rendering.
-- Always note "纯净无任何字幕" if clean frame is required.
+- Always note `纯净无任何字幕` if clean frame is required.
 - When specifying face center framing: `要求画面中人物居中，完整展示人物的整个脑袋和上半身，始终对焦人脸，人脸始终清晰。`
+- For strict logo/brand text rendering, supply the logo as an image reference instead of describing it in text.
 
-## 7) Debug Strategy
+## 6) Debug Strategy
 
 - If style drifts: strengthen reference bindings (`参考 图片1...`).
 - If motion drifts: constrain camera path and speed in short phrases.
-- If subtitles fail: explicitly ask for subtitle position, timing, and sync.
+- If subtitles fail: explicitly ask for subtitle position, timing, and sync (`字幕需与音频节奏完全同步`).
 - If output looks cropped: align requested `ratio` with input image ratio.
 - If character appearance inconsistent across frames: add multi-angle reference images.
-- If on-screen text rendering is wrong: use logo-reference pattern (3.2 multi-image, Logo参考).
+- If on-screen text/logo rendering is wrong: use logo-reference pattern (supply logo as image asset in multi-image reference).
 
-## 8) Prompt Formula Summary (from official guide)
+## 7) Prompt Formula Summary
+
+**Text generation:**
+- Slogan: `「文字内容」+「出现时机」+「出现位置」+「出现方式」，「文字特征」`
+- Subtitle: `画面底部出现字幕，字幕内容为"……"，字幕需与音频节奏完全同步。`
+- Speech bubble: `「角色」说："…"，角色说话时周围出现气泡，气泡里写着台词。`
 
 **Multimodal reference:**
 - Image: `参考/提取/结合 + 「图片n」中的「主体/被参考元素」，生成「画面描述」，保持特征一致。`
 - Video action: `参考「视频n」的「动作描述」，生成「画面描述」，保持动作细节一致。`
 - Video camera: `参考「视频n」的「运镜描述」，生成「画面描述」，保持运镜一致。`
+- Video effect: `参考「视频n」的「特效描述」，生成「画面描述」，保持特效一致。`
 - Audio timbre: `「角色」说："「台词」"，音色参考「音频n」。`
 - Audio content: `「理想出现时机」+「音频n」。`
 
@@ -185,7 +250,7 @@ Example:
 
 **Video extension:**
 - Single clip: `向前/向后延长「视频n」+「需延长的视频描述」`
-- Track fill: `「视频1」+「过渡画面描述」+接「视频2」+「过渡画面描述」+接「视频3」`
+- Track fill: `「视频1」+「过渡画面描述」+接「视频2」+「过渡画面描述」+接「视频3」`（max 3 clips, total ≤ 15s）
 
 ## Sources
 
