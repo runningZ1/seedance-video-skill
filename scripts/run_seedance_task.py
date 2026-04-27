@@ -10,8 +10,10 @@ import mimetypes
 import os
 import sys
 import time
+import subprocess
 from pathlib import Path
 from typing import Any
+from datetime import datetime
 
 
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
@@ -241,6 +243,87 @@ def build_payload(args: argparse.Namespace) -> dict[str, Any]:
     return payload
 
 
+def download_video(url: str, output_dir: Path, task_id: str) -> tuple[str, dict]:
+    """Download video from URL and return local path + metadata."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Extract extension from URL or default to mp4
+    ext = "mp4"
+    if ".m3u8" in url:
+        ext = "m3u8"
+    filename = f"seedance_{timestamp}_{task_id[-8:]}.{ext}"
+    filepath = output_dir / filename
+
+    print(f"Downloading video to {filepath}...")
+    result = subprocess.run(
+        ["curl", "-L", "-o", str(filepath), url],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"Download failed: {result.stderr}")
+
+    size = filepath.stat().st_size
+    return str(filepath), {"size_bytes": size, "size_mb": round(size / 1024 / 1024, 2)}
+
+
+def get_video_info(filepath: str) -> dict:
+    """Get video metadata using ffprobe."""
+    try:
+        result = subprocess.run(
+            [
+                "ffprobe", "-v", "quiet", "-print_format", "json",
+                "-show_format", "-show_streams", filepath
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            data = json.loads(result.stdout)
+            video_stream = next((s for s in data.get("streams", []) if s.get("codec_type") == "video"), {})
+            audio_stream = next((s for s in data.get("streams", []) if s.get("codec_type") == "audio"), {})
+            fmt = data.get("format", {})
+            return {
+                "duration_sec": round(float(fmt.get("duration", 0)), 2),
+                "width": video_stream.get("width"),
+                "height": video_stream.get("height"),
+                "fps": eval(video_stream.get("r_frame_rate", "0/1")) if video_stream.get("r_frame_rate") else None,
+                "video_codec": video_stream.get("codec_name"),
+                "audio_codec": audio_stream.get("codec_name"),
+                "audio_rate": audio_stream.get("sample_rate"),
+                "bitrate_kbps": round(int(fmt.get("bit_rate", 0)) / 1000) if fmt.get("bit_rate") else None,
+                "size_bytes": int(fmt.get("size", 0)),
+                "size_mb": round(int(fmt.get("size", 0)) / 1024 / 1024, 2),
+            }
+    except Exception:
+        pass
+    return {}
+
+
+def print_video_info(task_id: str, status: str, video_path: str | None, info: dict, elapsed: float):
+    """Print formatted video info summary."""
+    print("\n" + "=" * 50)
+    print("  视频生成完成")
+    print("=" * 50)
+    print(f"  任务ID:    {task_id}")
+    print(f"  状态:      {status}")
+    print(f"  生成耗时:  {elapsed:.1f} 秒")
+    if video_path and info:
+        print("-" * 50)
+        print("  视频信息:")
+        print(f"    文件:    {Path(video_path).name}")
+        print(f"    大小:    {info.get('size_mb', '?')} MB")
+        print(f"    分辨率:  {info.get('width')}×{info.get('height')}")
+        print(f"    时长:    {info.get('duration_sec', '?')} 秒")
+        print(f"    帧率:    {info.get('fps', '?')} fps")
+        print(f"    视频:    {info.get('video_codec', '?')}")
+        print(f"    音频:    {info.get('audio_codec', '?')} @ {info.get('audio_rate', '?')} Hz")
+        print(f"    码率:    {info.get('bitrate_kbps', '?')} kbps")
+    print("=" * 50 + "\n")
+
+
 def wait_for_terminal_status(
     client: Any,
     task_id: str,
@@ -337,6 +420,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--timeout", type=int, default=1800)
     parser.add_argument("--no-poll", action="store_true")
     parser.add_argument("--output-json")
+    parser.add_argument(
+        "--output-dir",
+        default="outputs",
+        help="Directory to save downloaded videos. Default: outputs",
+    )
+    parser.add_argument(
+        "--auto-download",
+        action="store_true",
+        help="Automatically download video after generation completes.",
+    )
     return parser.parse_args(argv)
 
 
@@ -395,6 +488,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     client = Ark(api_key=api_key)
+    start_time = time.time()
     print("Creating task with payload:")
     print(json.dumps(summarize_for_log(to_plain(payload)), ensure_ascii=False, indent=2))
 
@@ -439,17 +533,35 @@ def main(argv: list[str] | None = None) -> int:
     video_url = content.get("video_url") if isinstance(content, dict) else None
     last_frame_url = content.get("last_frame_url") if isinstance(content, dict) else None
 
+    # Calculate elapsed time
+    elapsed = time.time() - start_time
+
+    video_path = None
+    video_info = {}
     if video_url:
         print(f"Video URL: {video_url}")
+        if args.auto_download:
+            try:
+                output_dir = Path(args.output_dir)
+                video_path, video_info = download_video(video_url, output_dir, task_id)
+                video_info = get_video_info(video_path)
+            except Exception as exc:
+                print(f"Auto-download failed: {exc}", file=sys.stderr)
     if last_frame_url:
         print(f"Last frame URL: {last_frame_url}")
     if final_status == "failed":
         error_obj = plain_final.get("error") if isinstance(plain_final, dict) else None
         print(f"Task failed: {json.dumps(error_obj, ensure_ascii=False)}", file=sys.stderr)
+        print_video_info(task_id, "failed", None, {}, elapsed)
     elif final_status == "expired":
         print("Task expired before retrieval.", file=sys.stderr)
+        print_video_info(task_id, "expired", None, {}, elapsed)
+    elif final_status == "succeeded":
+        print_video_info(task_id, "succeeded", video_path, video_info, elapsed)
 
     if args.output_json:
+        output["video_path"] = video_path
+        output["video_info"] = video_info
         write_json(args.output_json, output)
 
     return 0 if final_status == "succeeded" else 4
